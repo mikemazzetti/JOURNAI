@@ -8,16 +8,13 @@ dotenv.config();
 const app = express();
 const port = 3001;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Initialize OpenAI with the API key
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Endpoint to get prompt suggestions
 app.post("/api/get-prompt", async (req, res) => {
   try {
     const { journalText } = req.body;
@@ -26,7 +23,7 @@ app.post("/api/get-prompt", async (req, res) => {
       return res.status(400).json({ error: "Journal text is required" });
     }
 
-    const promptForAI = `Based on the following journal entry text, suggest a short, relevant, and thoughtful follow-up writing prompt (1 sentence) to encourage further reflection or exploration of the themes mentioned. Do not repeat the text, just provide the prompt.
+    const promptForAI = `Based on the following journal entry text, suggest a short, relevant, and thoughtful follow-up prompt (1 sentence maximum) to encourage further reflection. Do not repeat the text, just provide the prompt, and use past entries for more insight.
 
 Journal Text:
 "${journalText}"

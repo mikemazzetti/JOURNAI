@@ -1,4 +1,4 @@
-# JOURNAI, a React-based journaling application ChatGPT to provide writing prompts based current and previous entries.
+# JOURNAI, a React-based journaling app using AI to provide unique and tailored prompts to the user
 
 - Built a full-stack Journal application with React, Tailwind CSS, and Express.js, allowing users make and save journal entries
 - Implemented CORS middleware, environment variable configuration via dotenv, and error handling for API responses
