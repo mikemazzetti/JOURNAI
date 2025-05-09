@@ -6,121 +6,110 @@ import Input from "./components/common/Input.jsx";
 import Alert from "./components/common/Alert.jsx";
 
 function App() {
-  const [journalText, setJournalText] = useState("");
-  const [suggestedPrompt, setSuggestedPrompt] = useState("");
-  const [savedEntries, setSavedEntries] = useState([]);
-  const [isLoadingPrompt, setIsLoadingPrompt] = useState(false);
-  const [error, setError] = useState("");
-  const [statusMessage, setStatusMessage] = useState("");
+  const [text, setText] = useState("");
+  const [prompt, setPrompt] = useState("");
+  const [entries, setEntries] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [err, setErr] = useState("");
+  const [msg, setMsg] = useState("");
 
-  const LOCAL_STORAGE_KEY = "reactJournalEntries";
+  const STORE_KEY = "journalEntries";
 
   useEffect(() => {
     try {
-      const storedEntries = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (storedEntries) {
-        setSavedEntries(JSON.parse(storedEntries));
-        console.log("Loaded saved entries from local storage.");
+      const stored = localStorage.getItem(STORE_KEY);
+      if (stored) {
+        setEntries(JSON.parse(stored));
+        console.log("Loaded entries from storage");
       }
     } catch (err) {
-      console.error(
-        "Failed to load or parse saved entries from local storage:",
-        err,
-      );
-      setError("Could not load saved journal entries.");
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      console.error("Failed to load entries:", err);
+      setErr("Could not load entries");
+      localStorage.removeItem(STORE_KEY);
     }
   }, []);
 
-  const handleGetPrompt = async () => {
-    if (!journalText.trim()) {
-      setError(
-        "Please write something in your journal first to get a relevant prompt.",
-      );
+  const getPrompt = async () => {
+    if (!text.trim()) {
+      setErr("Please write something first");
       return;
     }
 
-    setError("");
-    setSuggestedPrompt("");
-    setIsLoadingPrompt(true);
-    setStatusMessage("Getting prompt suggestion...");
+    setErr("");
+    setPrompt("");
+    setIsLoading(true);
+    setMsg("Getting suggestion...");
 
     try {
-      const response = await fetch("http://localhost:3001/api/get-prompt", {
+      const res = await fetch("http://localhost:3001/api/get-prompt", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ journalText }),
+        body: JSON.stringify({ journalText: text }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to get prompt suggestion");
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || "Failed to get suggestion");
       }
 
-      const data = await response.json();
-      setSuggestedPrompt(data.prompt);
-      setStatusMessage("Suggestion received!");
+      const data = await res.json();
+      setPrompt(data.prompt);
+      setMsg("Got suggestion!");
     } catch (err) {
-      console.error("Error fetching prompt:", err);
-      setError(err.message || "Failed to get prompt suggestion");
-      setStatusMessage("");
+      console.error("Error:", err);
+      setErr(err.message || "Failed to get suggestion");
+      setMsg("");
     } finally {
-      setIsLoadingPrompt(false);
+      setIsLoading(false);
     }
   };
 
-  const handleSaveEntry = () => {
-    if (!journalText.trim()) {
-      setError("Cannot save an empty journal entry.");
+  const saveEntry = () => {
+    if (!text.trim()) {
+      setErr("Cannot save empty entry");
       return;
     }
-    setError("");
+    setErr("");
 
-    const newEntry = {
+    const entry = {
       id: Date.now(),
-      text: journalText,
+      text,
       savedAt: new Date().toISOString(),
     };
 
-    const updatedEntries = [newEntry, ...savedEntries];
-    setSavedEntries(updatedEntries);
+    const updated = [entry, ...entries];
+    setEntries(updated);
 
     try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedEntries));
-      setStatusMessage("Entry saved successfully!");
+      localStorage.setItem(STORE_KEY, JSON.stringify(updated));
+      setMsg("Saved!");
     } catch (err) {
-      console.error("Failed to save entry to local storage:", err);
-      setError(
-        "Could not save entry. Local storage might be full or disabled.",
-      );
-      setSavedEntries(savedEntries);
+      console.error("Save failed:", err);
+      setErr("Save failed - storage might be full");
+      setEntries(entries);
     }
 
-    setTimeout(() => setStatusMessage(""), 3000);
+    setTimeout(() => setMsg(""), 3000);
   };
 
-  const handleDeleteEntry = (idToDelete) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this journal entry?",
-    );
-    if (!confirmed) return;
+  const deleteEntry = (id) => {
+    const ok = window.confirm("Delete this entry?");
+    if (!ok) return;
 
-    const updatedEntries = savedEntries.filter(
-      (entry) => entry.id !== idToDelete,
-    );
-    setSavedEntries(updatedEntries);
+    const updated = entries.filter(entry => entry.id !== id);
+    setEntries(updated);
 
     try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedEntries));
-      setStatusMessage("Entry deleted.");
+      localStorage.setItem(STORE_KEY, JSON.stringify(updated));
+      setMsg("Deleted");
     } catch (err) {
-      console.error("Failed to update local storage after deletion:", err);
-      setError("Could not update saved entries after deletion.");
-      setSavedEntries(savedEntries);
+      console.error("Delete failed:", err);
+      setErr("Delete failed");
+      setEntries(entries);
     }
-    setTimeout(() => setStatusMessage(""), 3000);
+    setTimeout(() => setMsg(""), 3000);
   };
 
   return (
@@ -132,61 +121,61 @@ function App() {
 
         <div className="mb-4">
           <label
-            htmlFor="journalEntry"
+            htmlFor="entry"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
             Today's thoughts:
           </label>
           <TextArea
-            id="journalEntry"
-            value={journalText}
-            onChange={(e) => setJournalText(e.target.value)}
-            placeholder="Start writing your journal entry here..."
+            id="entry"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Start writing..."
             className="w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
             rows={8}
-            disabled={isLoadingPrompt}
+            disabled={isLoading}
           />
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <Button
-            onClick={handleGetPrompt}
-            disabled={isLoadingPrompt || !journalText.trim()}
+            onClick={getPrompt}
+            disabled={isLoading || !text.trim()}
             variant="outline"
             className="w-full sm:w-auto"
           >
-            {isLoadingPrompt ? "Getting Suggestion..." : "Suggest a Prompt"}
+            {isLoading ? "Getting..." : "Get Prompt"}
           </Button>
           <Button
-            onClick={handleSaveEntry}
-            disabled={isLoadingPrompt || !journalText.trim()}
+            onClick={saveEntry}
+            disabled={isLoading || !text.trim()}
             variant="default"
             className="w-full sm:w-auto"
           >
-            Save Entry
+            Save
           </Button>
         </div>
 
-        {suggestedPrompt && (
+        {prompt && (
           <div className="mb-4 p-3 bg-indigo-50 border border-indigo-200 rounded-md">
             <p className="text-sm font-medium text-indigo-700 mb-1">
-              Suggested Prompt:
+              Prompt:
             </p>
-            <p className="text-sm text-indigo-800 italic">{suggestedPrompt}</p>
+            <p className="text-sm text-indigo-800 italic">{prompt}</p>
           </div>
         )}
 
-        <Alert message={error} type="error" className="my-2" />
-        <Alert message={statusMessage} type="success" className="my-2" />
+        <Alert message={err} type="error" className="my-2" />
+        <Alert message={msg} type="success" className="my-2" />
       </Card>
 
-      {savedEntries.length > 0 && (
+      {entries.length > 0 && (
         <Card className="w-full max-w-3xl">
           <h2 className="text-xl font-semibold text-gray-700 mb-3">
-            Saved Entries
+            Entries
           </h2>
           <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
-            {savedEntries.map((entry) => (
+            {entries.map((entry) => (
               <div
                 key={entry.id}
                 className="p-3 border rounded-md bg-gray-50 relative group"
@@ -198,10 +187,10 @@ function App() {
                   {entry.text}
                 </p>
                 <Button
-                  onClick={() => handleDeleteEntry(entry.id)}
+                  onClick={() => deleteEntry(entry.id)}
                   variant="secondary"
                   className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 h-auto"
-                  aria-label="Delete entry"
+                  aria-label="Delete"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
