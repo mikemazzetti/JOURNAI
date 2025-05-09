@@ -18,32 +18,31 @@ cd journal-app-vite
 npm install
 ```
 
-3. Create a `.env` file in the root directory and add your OpenAI API key:
+3. Create a `.env` file in the root directory and add AI model API key (only chatGPT functionality ATM):
 ```
 OPENAI_API_KEY=your_api_key_here
 ```
 
 4. Start the development servers:
 
-In one terminal (for the backend):
+In one terminal (for the back-end):
 ```bash
 npm run server
 ```
 
-In another terminal (for the frontend):
+In another terminal (for the front-end):
 ```bash
 npm run dev
 ```
 
-5. Open your browser and navigate to `http://localhost:5173` (or the port shown in your terminal)
+5. Open your browser and navigate to `http://localhost:5173` (or port shown in terminal if different.)
 
-## Development
+## Running/Testing
 
 - `npm run dev` - Start the frontend development server
 - `npm run server` - Start the backend server
 - `npm run build` - Build for production
-- `npm run preview` - Preview production build
 
 ## License
 
-MIT 
+MIT LICENSE
