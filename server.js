@@ -23,7 +23,7 @@ app.post("/api/get-prompt", async (req, res) => {
       return res.status(400).json({ error: "Journal text is required" });
     }
 
-    const promptForAI = `Based on the following journal entry text, suggest a short, relevant, and thoughtful follow-up prompt (1 sentence maximum) to encourage further reflection. Do not repeat the text, just provide the prompt, and use past entries for more insight.
+    const promptForAI = `Based on the following journal entry text, suggest a short and thoughtful follow-up prompt (1 sentence maximum length) to encourage more reflection. Do not repeat the text given, just provide the responseprompt, and use past entries for more insight.
 
 Journal Text:
 "${journalText}"
@@ -32,7 +32,7 @@ Suggested follow-up prompt:`;
 
     const chatCompletion = await openai.chat.completions.create({
       messages: [{ role: "user", content: promptForAI }],
-      model: "gpt-3.5-turbo",
+      model: "gpt-3.5-turbo", // Select whatever model you want here
       temperature: 0.6,
       max_tokens: 50,
       n: 1,
@@ -42,7 +42,7 @@ Suggested follow-up prompt:`;
     if (prompt) {
       res.json({ prompt });
     } else {
-      throw new Error("No prompt suggestion received from AI.");
+      throw new Error("No prompt suggestion received from AI model");
     }
   } catch (error) {
     console.error("Error:", error);

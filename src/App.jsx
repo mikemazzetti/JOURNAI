@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import Button from "./components/common/Button.jsx";
 import Card from "./components/common/Card.jsx";
 import TextArea from "./components/common/TextArea.jsx";
-import Input from "./components/common/Input.jsx";
 import Alert from "./components/common/Alert.jsx";
 
 function App() {
@@ -20,7 +19,7 @@ function App() {
       const stored = localStorage.getItem(STORE_KEY);
       if (stored) {
         setEntries(JSON.parse(stored));
-        console.log("Loaded entries from storage");
+        console.log("Loaded entriese");
       }
     } catch (err) {
       console.error("Failed to load entries:", err);
@@ -31,7 +30,7 @@ function App() {
 
   const getPrompt = async () => {
     if (!text.trim()) {
-      setErr("Please write something first");
+      setErr("Please write your thoughtsfirst");
       return;
     }
 
@@ -68,7 +67,7 @@ function App() {
 
   const saveEntry = () => {
     if (!text.trim()) {
-      setErr("Cannot save empty entry");
+      setErr("Can't save empty entry");
       return;
     }
     setErr("");
@@ -87,7 +86,7 @@ function App() {
       setMsg("Saved!");
     } catch (err) {
       console.error("Save failed:", err);
-      setErr("Save failed - storage might be full");
+      setErr("Save failed");
       setEntries(entries);
     }
 
@@ -213,7 +212,7 @@ function App() {
         </Card>
       )}
       <footer className="mt-6 text-center text-xs text-gray-500">
-        Journal App | Powered by OpenAI
+        JOURNAI | Powered by OpenAI / React / PostgreSQL
       </footer>
     </div>
   );

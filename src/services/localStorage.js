@@ -13,7 +13,7 @@ export const loadEntries = () => {
     return []; 
   } catch (error) {
     console.error(
-      "Failed to load or parse saved entries from local storage:",
+      "Failed to load saved entries",
       error,
     );
     return []; 
@@ -26,7 +26,7 @@ export const loadEntries = () => {
  */
 export const saveEntries = (entries) => {
   if (!Array.isArray(entries)) {
-    console.error("Attempted to save non-array data to local storage.");
+    console.error("Error attempting to save non-array data");
     return false;
   }
   try {
@@ -34,7 +34,7 @@ export const saveEntries = (entries) => {
     localStorage.setItem(LOCAL_STORAGE_KEY, entriesString);
     return true; 
   } catch (error) {
-    console.error("Failed to save entries to local storage:", error);
+    console.error("Failed to save entries", error);
     return false; 
   }
 };
