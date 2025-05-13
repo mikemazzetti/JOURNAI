@@ -20,7 +20,7 @@ npm install
 
 3. Create a `.env` file in the root directory and add AI model API key (only chatGPT functionality ATM):
 ```
-OPENAI_API_KEY= #Put your ChatGPT API key here
+OPENAI_API_KEY= # Put your ChatGPT API key here
 ```
 
 4. Start the development servers:
